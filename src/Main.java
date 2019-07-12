@@ -1,4 +1,5 @@
 import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 
 public class Main {
@@ -9,7 +10,9 @@ public class Main {
                 System.getProperty("user.dir"));
 
 
-        boolean doGenetic = true;
+        boolean doGenetic = false;
+        boolean doTestGenetic = true;
+        boolean doFixedAngle = false;
 
         if (doGenetic) {
             GenerationElytra parent = new GenerationElytra(new Parameters());
@@ -25,16 +28,16 @@ public class Main {
                 parent = child;
             }
         }
-        else {
+        else if (doTestGenetic){
 
 
             NucleusElytra defaultNucleus = new NucleusElytra();
-            defaultNucleus.pullUpAngle = -50.734432f;
-            defaultNucleus.pullDownAngle = 36.95915f;
-            defaultNucleus.pullUpMinVelocity = 1.7259855f;
-            defaultNucleus.pullDownMaxVelocity = 2.136922f;
-            defaultNucleus.pullUpSpeed = 2.0569143f;
-            defaultNucleus.pullDownSpeed = 0.37636718f;
+            defaultNucleus.pullUpAngle = -46.633514f;
+            defaultNucleus.pullDownAngle = 37.19872f;
+            defaultNucleus.pullUpMinVelocity = 1.9102669f;
+            defaultNucleus.pullDownMaxVelocity = 2.3250866f;
+            defaultNucleus.pullUpSpeed = 2.1605124f;
+            defaultNucleus.pullDownSpeed = 0.20545267f;
 
             Elytra elytra = new Elytra();
 
@@ -51,21 +54,45 @@ public class Main {
 
             ParabolicFlightControl flightControl = new ParabolicFlightControl(elytra, defaultNucleus);
 
-            flightControl.OpenData("test.csv");
+            PrintWriter writer = new PrintWriter("testGenetic.csv", "UTF-8");
 
             // 5 minutes
             for (int i = 0; i < 60 * 60 * 5; i++) {
                 flightControl.Tick();
 
                 if (i % 3 == 0)
-                    flightControl.WriteData();
+                    flightControl.WriteData(writer);
             }
+            writer.close();
 
-            flightControl.CloseData();
 
             flightControl.ApplyFitness();
             System.out.println(defaultNucleus.toString());
             //}
+        }
+        else if (doFixedAngle)
+        {
+            PrintWriter writer = new PrintWriter("fixedAngles.csv", "UTF-8");
+            for (float fixedAngle = -20; fixedAngle <= 20; fixedAngle += 5 )
+            {
+                NucleusElytra fixedAngleNucleus = new NucleusElytra();
+                fixedAngleNucleus.fixedAngle = true;
+                fixedAngleNucleus.fixedAngleValue = fixedAngle;
+
+                Elytra elytra = new Elytra();
+                elytra.ResetElytra();
+                ParabolicFlightControl flightControl = new ParabolicFlightControl(elytra, fixedAngleNucleus);
+
+                // 30 seconds
+                for (int i = 0; i < 30 * 60 * 1; i++) {
+                    flightControl.Tick();
+
+                    if (i % 3 == 0)
+                        flightControl.WriteData(writer);
+                }
+
+            }
+            writer.close();
         }
 
 

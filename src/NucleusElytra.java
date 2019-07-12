@@ -6,6 +6,9 @@ public class NucleusElytra implements INucleus {
     public float pullUpSpeed;
     public float pullDownSpeed;
 
+    public boolean fixedAngle;
+    public float fixedAngleValue;
+
     private FitnessCalculator fitnessCalculator;
 
     private Parameters parameters;

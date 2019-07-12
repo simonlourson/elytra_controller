@@ -1,6 +1,7 @@
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.OptionalDouble;
 
@@ -84,6 +85,9 @@ public class ParabolicFlightControl {
                 elytra.Pitch = nucleusElytra.pullDownAngle;
             }
         }
+
+        if (nucleusElytra.fixedAngle)
+            elytra.Pitch = nucleusElytra.fixedAngleValue;
 
         tick++;
     }
@@ -193,6 +197,11 @@ public class ParabolicFlightControl {
         writer.println(tick + ";" + currentVelocity + ";" + elytra.Position.X + ";" + elytra.Position.Y + ";" + elytra.Position.Z + ";");
     }
 
+    public void WriteData(PrintWriter writer)
+    {
+        writer.println(formatForAnalysis(elytra.Pitch) + ";" + tick + ";" + formatForAnalysis(currentVelocity) + ";" + formatForAnalysis(elytra.Position.X) + ";" + formatForAnalysis(elytra.Position.Y) + ";" + formatForAnalysis(elytra.Position.Z) + ";");
+    }
+
     public void CloseData()
     {
         Fitness();
@@ -201,6 +210,17 @@ public class ParabolicFlightControl {
         writer.println("averageHeight : " + averageHeight);
 
         writer.close();
+    }
+
+    private String formatForAnalysis(float f)
+    {
+        return String.format("%,2f", f);
+    }
+
+    DecimalFormat df = new DecimalFormat("#.#######");
+    private String formatForAnalysis(double d)
+    {
+        return df.format(d);
     }
 
     public double distanceTravelled;
